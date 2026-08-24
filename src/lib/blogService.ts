@@ -162,17 +162,18 @@ export async function deletePost(id: string) {
 }
 
 export async function duplicatePost(post: BlogPost) {
-  const duplicateSlug = `${post.slug}-${Date.now().toString().slice(-5)}`;
-  const tags = await getPostTags(post.id);
+  const source = await getPost(post.id);
+  const duplicateSlug = `${source.slug}-${Date.now().toString().slice(-5)}`;
+  const tags = source.blog_tags ?? await getPostTags(source.id);
+
   return savePost({
-    ...post,
+    ...source,
     id: '',
-    title: `${post.title} Copy`,
+    title: `${source.title} Copy`,
     slug: duplicateSlug,
     status: 'draft',
     published_at: null,
     scheduled_at: null,
-    is_featured: false,
     tag_ids: tags.map((tag) => tag.id),
   });
 }
@@ -237,6 +238,7 @@ export async function deleteComment(id: string) {
   const { error } = await supabase.from('blog_comments').delete().eq('id', id);
   if (error) throw error;
 }
+
 
 
 
