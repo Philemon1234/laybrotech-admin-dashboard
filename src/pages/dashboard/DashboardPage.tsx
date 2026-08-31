@@ -1,5 +1,5 @@
 ﻿import { useEffect, useState } from 'react';
-import { FiCalendar, FiCheckCircle, FiEdit3, FiFileText, FiMessageSquare } from 'react-icons/fi';
+import { FiCalendar, FiCheckCircle, FiEdit3, FiFileText, FiInbox, FiMessageSquare } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -7,8 +7,8 @@ import { supabase } from '../../lib/supabase';
 import type { BlogPost } from '../../types/blog';
 import { formatDate } from '../../utils/blog';
 
-type DashboardStats = { totalPosts: number; publishedPosts: number; drafts: number; scheduled: number; pendingComments: number };
-const emptyStats: DashboardStats = { totalPosts: 0, publishedPosts: 0, drafts: 0, scheduled: 0, pendingComments: 0 };
+type DashboardStats = { totalPosts: number; publishedPosts: number; drafts: number; scheduled: number; pendingComments: number; newEnquiries: number };
+const emptyStats: DashboardStats = { totalPosts: 0, publishedPosts: 0, drafts: 0, scheduled: 0, pendingComments: 0, newEnquiries: 0 };
 
 async function getCount(table: string, filter?: { column: string; value: string }) {
   let query = supabase.from(table).select('*', { count: 'exact', head: true });
@@ -24,6 +24,7 @@ const statMeta = [
   { key: 'drafts', label: 'Drafts', icon: FiEdit3, tone: 'bg-blue-50 text-blue-600' },
   { key: 'scheduled', label: 'Scheduled', icon: FiCalendar, tone: 'bg-orange-50 text-brand-orange' },
   { key: 'pendingComments', label: 'Pending Comments', icon: FiMessageSquare, tone: 'bg-amber-50 text-amber-700' },
+  { key: 'newEnquiries', label: 'New Enquiries', icon: FiInbox, tone: 'bg-[#fff4ec] text-brand-orange' },
 ] as const;
 
 export function DashboardPage() {
@@ -36,16 +37,17 @@ export function DashboardPage() {
     let mounted = true;
     async function loadDashboard() {
       try {
-        const [totalPosts, publishedPosts, drafts, scheduled, pendingComments] = await Promise.all([
+        const [totalPosts, publishedPosts, drafts, scheduled, pendingComments, newEnquiries] = await Promise.all([
           getCount('blog_posts'),
           getCount('blog_posts', { column: 'status', value: 'published' }),
           getCount('blog_posts', { column: 'status', value: 'draft' }),
           getCount('blog_posts', { column: 'status', value: 'scheduled' }),
           getCount('blog_comments', { column: 'status', value: 'pending' }),
+          getCount('enquiries', { column: 'status', value: 'new' }),
         ]);
         const { data, error: postsError } = await supabase.from('blog_posts').select('id,title,slug,excerpt,featured_image_url,featured_image_alt,status,author_name,published_at,scheduled_at,created_at,updated_at').order('updated_at', { ascending: false }).limit(5);
         if (postsError) throw postsError;
-        if (mounted) { setStats({ totalPosts, publishedPosts, drafts, scheduled, pendingComments }); setRecentPosts((data ?? []) as BlogPost[]); }
+        if (mounted) { setStats({ totalPosts, publishedPosts, drafts, scheduled, pendingComments, newEnquiries }); setRecentPosts((data ?? []) as BlogPost[]); }
       } catch (_error) { if (mounted) setError('Could not load dashboard data from Supabase.'); }
       finally { if (mounted) setLoading(false); }
     }
@@ -59,7 +61,7 @@ export function DashboardPage() {
 
       {error ? <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">{error}</p> : null}
 
-      <section className="grid overflow-hidden rounded-lg border border-brand-border bg-white sm:grid-cols-2 xl:grid-cols-5" aria-label="Blog summary statistics">
+      <section className="grid overflow-hidden rounded-lg border border-brand-border bg-white sm:grid-cols-2 xl:grid-cols-6" aria-label="Blog summary statistics">
         {statMeta.map((item) => {
           const Icon = item.icon;
           return (
@@ -93,4 +95,5 @@ export function DashboardPage() {
     </div>
   );
 }
+
 

@@ -8,6 +8,7 @@ import { useAuth } from './hooks/useAuth';
 
 const BlogListPage = lazy(() => import('./pages/blog/BlogListPage').then((module) => ({ default: module.BlogListPage })));
 const DashboardPage = lazy(() => import('./pages/dashboard/DashboardPage').then((module) => ({ default: module.DashboardPage })));
+const EnquiriesPage = lazy(() => import('./pages/enquiries/EnquiriesPage').then((module) => ({ default: module.EnquiriesPage })));
 const PostEditorPage = lazy(() => import('./pages/blog/PostEditorPage').then((module) => ({ default: module.PostEditorPage })));
 const PostPreviewPage = lazy(() => import('./pages/blog/PostPreviewPage').then((module) => ({ default: module.PostPreviewPage })));
 const SettingsPage = lazy(() => import('./pages/settings/SettingsPage').then((module) => ({ default: module.SettingsPage })));
@@ -36,6 +37,7 @@ export function App() {
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Suspense fallback={<PageLoader />}><DashboardPage /></Suspense>} />
           <Route path="/blog" element={<Suspense fallback={<PageLoader />}><BlogListPage /></Suspense>} />
+          <Route path="/enquiries" element={<Suspense fallback={<PageLoader />}><EnquiriesPage /></Suspense>} />
           <Route path="/blog/new" element={<Suspense fallback={<PageLoader />}><PostEditorPage mode="new" /></Suspense>} />
           <Route path="/blog/:id/edit" element={<Suspense fallback={<PageLoader />}><PostEditorPage mode="edit" /></Suspense>} />
           <Route path="/blog/:id/preview" element={<Suspense fallback={<PageLoader />}><PostPreviewPage /></Suspense>} />
@@ -50,3 +52,4 @@ export function App() {
     </Routes>
   );
 }
+

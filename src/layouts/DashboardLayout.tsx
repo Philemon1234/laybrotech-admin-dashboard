@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react';
-import { FiBookOpen, FiGrid, FiLogOut, FiMenu, FiSettings, FiX } from 'react-icons/fi';
+import { FiBookOpen, FiGrid, FiInbox, FiLogOut, FiMenu, FiSettings, FiX } from 'react-icons/fi';
 import { NavLink, Outlet } from 'react-router-dom';
 
 import logo from '../assets/LaybroTech-Logo.png';
@@ -8,6 +8,7 @@ import { useAuth } from '../hooks/useAuth';
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: FiGrid },
   { label: 'Blog', href: '/blog', icon: FiBookOpen },
+  { label: 'Enquiries', href: '/enquiries', icon: FiInbox },
   { label: 'Settings', href: '/settings', icon: FiSettings },
 ];
 
@@ -57,6 +58,7 @@ export function DashboardLayout() {
     </div>
   );
 }
+
 
 
 
